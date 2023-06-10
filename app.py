@@ -11,7 +11,7 @@ wav_file_path = "record.wav"
 
 def sound_to_text(file_path):
     if os.path.exists(file_path):
-        model = whisper.load_model("large") # this is model size of whisper base or small or medium or large
+        model = whisper.load_model("small") # this is model size of whisper base or small or medium or large
         result = model.transcribe(file_path)
         st.text(result["text"])
 
