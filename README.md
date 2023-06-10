@@ -1,3 +1,5 @@
-# whisper-demo
+This is a simple demo application that performs recording with GUI and transcribes the recorded material with Whisper.
 
-This is a demo of recording audio in python and converting it to a string in whisper
+https://github.com/openai/whisper
+
+![demo](localhost_8501_.png)
