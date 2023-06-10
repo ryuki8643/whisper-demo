@@ -1,33 +1,39 @@
 import sounddevice as sd
 import numpy as np
-from scipy.io.wavfile import write
 import os
 import whisper
+import streamlit as st
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, ClientSettings
+from aiortc.contrib.media import MediaRecorder
 
-def record(filename):
 
-    fs = 44100
-    t = 5
-    rec = sd.rec(int(t * fs), samplerate=fs, channels=2, dtype='float32')
-    sd.wait()
+wav_file_path = "record.wav"
 
-    write(filename, fs, rec)
+def sound_to_text(file_path):
+    if os.path.exists(file_path):
+        model = whisper.load_model("base")
+        result = model.transcribe(file_path)
+        st.text(result["text"])
 
-def remove_file(filename):
-    if os.path.exists(filename):
-        os.remove(filename)
-    else:
-        print("The file does not exist")
 
-def sound_to_text(filename):
+def recorder_factory():
+    return MediaRecorder(wav_file_path)
 
-    model = whisper.load_model("base")
-    result = model.transcribe(filename)
-    print(result["text"])
+st.title('Record to Text By Whisper ')
 
-if __name__ == '__main__':
-    filename = 'output.wav'
 
-    record(filename=filename)
-    sound_to_text(filename=filename)
-    remove_file(filename=filename)
+webrtc_streamer(
+        key="sendonly-audio",
+        mode=WebRtcMode.SENDRECV,
+        in_recorder_factory=recorder_factory,
+        client_settings=ClientSettings(
+            media_stream_constraints={
+                "audio": True,
+                "video": False,
+            },
+        ),
+    )
+
+if st.button('Whisper text recognition'):
+        st.text('Button clicked. Here is some text.')
+        sound_to_text(wav_file_path)
